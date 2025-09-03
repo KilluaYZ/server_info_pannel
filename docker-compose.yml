@@ -1,0 +1,18 @@
+version: '3.8'
+
+services:
+  server-info-app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    environment:
+      - FLASK_ENV=production
+    restart: unless-stopped
+    volumes:
+      - /:/host:ro  # 只读挂载主机根目录以获取系统信息
+    # 注意：在生产环境中可能需要调整挂载权限
+    # 对于系统信息监控，容器需要适当的权限
+    # 在开发环境中可以添加：privileged: true
+    # 在生产环境中建议使用更细粒度的权限控制
