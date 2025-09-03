@@ -33,7 +33,7 @@ const fetchServerInfo = async () => {
   try {
     loading.value = true
     error.value = null
-    const response = await fetch('http://localhost:8080/api/server-info')
+    const response = await fetch('/api/server-info')
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
@@ -78,7 +78,7 @@ onMounted(() => {
         </div>
 
         <div class="system-info-footer">
-          <p>系统: {{ serverInfo.operating_system }} | CPU: {{ serverInfo.cpu_usage.toFixed(2) }}% | 内存: {{ (serverInfo.memory_usage.used / serverInfo.memory_usage.total * 100).toFixed(2) }}% | 磁盘: {{ (serverInfo.disk_usage.used / serverInfo.disk_usage.total * 100).toFixed(2) }}% | 运行: {{ serverInfo.uptime.day }}天{{ serverInfo.uptime.hour }}时{{ serverInfo.uptime.minute }}分</p>
+          <p>系统: {{ serverInfo.operating_system }} | CPU: {{ serverInfo.cpu_usage.toFixed(2) }}% | 内存: {{ (serverInfo.memory_usage.used / 1024).toFixed(2) }}G/{{ (serverInfo.memory_usage.total / 1024).toFixed(2) }}G | 磁盘: {{ serverInfo.disk_usage.used.toFixed(2) }}G/{{ serverInfo.disk_usage.total.toFixed(2) }}G | 运行: {{ serverInfo.uptime.day }}天{{ serverInfo.uptime.hour }}时{{ serverInfo.uptime.minute }}分</p>
         </div>
       </div>
     </main>

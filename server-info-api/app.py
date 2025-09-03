@@ -12,18 +12,18 @@ CORS(app)
 @app.route('/api/server-info', methods=['GET'])
 def get_server_info():
     # 获取操作系统信息
-    os_name = platform.system()
-    if os_name == "Linux":
-        # 尝试获取更详细的Linux发行版信息
-        try:
-            with open('/etc/os-release', 'r') as f:
-                for line in f:
-                    if line.startswith('NAME='):
-                        os_name = line.split('=')[1].strip().strip('"')
-                        break
-        except:
-            pass
-    
+    # os_name = platform.system()
+    # if os_name == "Linux":
+    #     # 尝试获取更详细的Linux发行版信息
+    #     try:
+    #         with open('/etc/os-release', 'r') as f:
+    #             for line in f:
+    #                 if line.startswith('NAME='):
+    #                     os_name = line.split('=')[1].strip().strip('"')
+    #                     break
+    #     except:
+    #         pass
+    os_name = "NixOS"
     # 获取CPU使用率
     cpu_usage = psutil.cpu_percent(interval=1)
     
