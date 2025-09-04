@@ -34,6 +34,7 @@ const fetchServerInfo = async () => {
     loading.value = true
     error.value = null
     const response = await fetch('/api/server-info')
+    // const response = await fetch('http://127.0.0.1:5000/api/server-info')
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`)
     }
@@ -53,18 +54,17 @@ onMounted(() => {
 
 <template>
   <div class="app">
-    <header>
+     <header>
       <h1>已经正常上线 {{ serverInfo ? serverInfo.uptime.day : 0 }} 天</h1>
     </header>
-
     <main class="main-content">
       <div v-if="loading" class="loading">
         <div class="spinner"></div>
-        <p style="color: #fff; font-size: 1.5rem;">欢迎来到ISER实验室知识库...</p>
+        <p style="color: #fff; font-size: clamp(1rem, 3vw, 1.5rem);">欢迎来到ISER实验室知识库...</p>
       </div>
 
       <div v-else-if="error" class="error">
-        <p style="color: #fff; font-size: 1.5rem;">{{ error }}</p>
+        <p style="color: #fff; font-size: clamp(1rem, 3vw, 1.5rem);">{{ error }}</p>
         <button @click="fetchServerInfo" class="retry-btn">重试</button>
       </div>
 
@@ -72,8 +72,8 @@ onMounted(() => {
 
         <div class="quote-section">
           <div class="quote-card">
-            <p class="quote typing-animation">{{ serverInfo.word.content }}</p>
-            <p class="author">—— {{ serverInfo.word.author }}</p>
+            <span class="quote typing-animation">{{ serverInfo.word.content }}</span>
+            <span class="author">—— {{ serverInfo.word.author }}</span>
           </div>
         </div>
 
@@ -96,15 +96,18 @@ onMounted(() => {
 }
 
 header {
-  text-align: center;
-  margin-bottom: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: fit-content;
 }
 
 header h1 {
   color:rgb(255, 255, 255);
-  font-size: 2rem;
-  margin-bottom: 2rem;
-  text-align: center;
+  font-size: clamp(1rem, 5vw, 3rem);
+  width: fit-content;
+  height: fit-content;
 }
 
 .main-content {
@@ -112,7 +115,8 @@ header h1 {
   flex-direction: column;
   align-items: center;
   flex: 1;
-  justify-content: center;
+  justify-content: flex-start;
+  position: relative;
 }
 
 .loading {
@@ -162,10 +166,15 @@ header h1 {
 }
 
 .quote-section {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
   display: flex;
   justify-content: center;
   align-items: center;
-  flex: 1;
+  width: 100%;
+  z-index: 10;
 }
 
 .quote-card {
@@ -176,7 +185,6 @@ header h1 {
 
 .quote {
   line-height: 1.6;
-  margin-bottom: 2rem;
   font-weight: bold;
   letter-spacing: 1px;
   word-wrap: break-word;
@@ -184,10 +192,15 @@ header h1 {
 }
 
 .author {
-  font-size: 2rem;
+  font-size: clamp(0.8rem, 2vw, 1.5rem);
   font-style: italic;
   text-align: right;
-  margin-top: 2rem;
+}
+
+.quote span {
+  height: fit-content;
+  margin: 0;
+  padding: 0;
 }
 
 .author, .quote {
@@ -202,7 +215,7 @@ header h1 {
   background: rgba(255, 255, 255, 0.9);
   padding: 0.5rem;
   text-align: center;
-  font-size: 0.8rem;
+  font-size: clamp(0.6rem, 1.5vw, 0.8rem);
   color: #7f8c8d;
   border-top: 1px solid #e0e0e0;
 }
@@ -265,7 +278,7 @@ header h1 {
 
 .quote {
   font-style: italic;
-  font-size: 4rem;
+  font-size: clamp(1rem, 5vw, 3rem);
   margin: 0;
 }
 
@@ -285,7 +298,7 @@ header h1 {
   background: #229954;
 }
 
-@media (max-width: 768px) {
+/* @media (max-width: 768px) {
   .app {
     padding: 1rem;
   }
@@ -297,5 +310,5 @@ header h1 {
   .server-info {
     grid-template-columns: 1fr;
   }
-}
+} */
 </style>
