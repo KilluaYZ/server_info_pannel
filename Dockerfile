@@ -2,6 +2,8 @@
 
 # 第一阶段：构建前端应用
 FROM node:20-alpine AS frontend-builder
+ENV HTTP_PROXY=http://cloud.killuayz.top:20172
+ENV HTTPS_PROXY=http://cloud.killuayz.top:20172
 
 WORKDIR /app/frontend
 
@@ -14,6 +16,8 @@ RUN npm run build
 
 # 第二阶段：构建后端应用
 FROM python:3.12-alpine AS backend-builder
+ENV HTTP_PROXY=http://cloud.killuayz.top:20172
+ENV HTTPS_PROXY=http://cloud.killuayz.top:20172
 
 WORKDIR /app/backend
 
@@ -28,6 +32,8 @@ COPY server-info-api/ ./
 
 # 第三阶段：生产环境
 FROM python:3.12-alpine
+ENV HTTP_PROXY=http://cloud.killuayz.top:20172
+ENV HTTPS_PROXY=http://cloud.killuayz.top:20172
 
 WORKDIR /app
 
@@ -57,8 +63,7 @@ EXPOSE 8080
 ENV PYTHONPATH=/app/backend
 ENV FLASK_APP=app.py
 ENV FLASK_ENV=production
-ENV http_proxy=http://station.killuayz.top:20172
-ENV https_proxy=http://station.killuayz.top:20172
+ENV PYTHONUNBUFFERED=1
 
 # 启动命令 - 同时服务前端静态文件和后端API
 CMD ["python", "-m", "flask", "run", "--host=0.0.0.0", "--port=8080"]

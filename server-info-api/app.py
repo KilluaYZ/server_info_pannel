@@ -81,15 +81,30 @@ def get_server_info():
     # 获取hitokoto名言
     word_data = {"content": "Talk is cheap, show me your code", "author": "Linus Torvalds"}
     try:
+        app.logger.info("正在请求 hitokoto API...")
         response = requests.get('https://v1.hitokoto.cn', timeout=3)
+        app.logger.info(f"收到响应，状态码: {response.status_code}")
         if response.status_code == 200:
-            hitokoto_data = response.json()
-            word_data = {
-                "content": hitokoto_data.get('hitokoto', 'Talk is cheap, show me your code'),
-                "author": hitokoto_data.get('from_who') or hitokoto_data.get('from', 'Linus Torvalds')
-            }
-    except:
-        pass
+            try:
+                hitokoto_data = response.json()
+                app.logger.info(f"成功解析 JSON，数据: {hitokoto_data}")
+                word_data = {
+                    "content": hitokoto_data.get('hitokoto', 'Talk is cheap, show me your code'),
+                    "author": hitokoto_data.get('from_who') or hitokoto_data.get('from', 'Linus Torvalds')
+                }
+                app.logger.info(f"更新后的 word_data: {word_data}")
+            except Exception as e:
+                app.logger.error(f"解析 hitokoto API 响应 JSON 时出错: {e}")
+                app.logger.error(f"响应内容: {response.text[:200]}")
+        else:
+            app.logger.warning(f"获取 hitokoto 名言失败，HTTP 状态码: {response.status_code}")
+            app.logger.warning(f"响应内容: {response.text[:200]}")
+    except requests.exceptions.Timeout:
+        app.logger.error("获取 hitokoto 名言超时（超过 3 秒）")
+    except requests.exceptions.ConnectionError as e:
+        app.logger.error(f"获取 hitokoto 名言连接错误: {e}")
+    except Exception as e:
+        app.logger.error(f"获取 hitokoto 名言时出错: {type(e).__name__}: {e}")
     
     # 构建响应数据
     response_data = {

@@ -1,12 +1,10 @@
-version: '3.8'
-
 services:
-  server-info-app:
+  server_info_app:
     build:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8081:8080"
+      - "18081:8080"
     environment:
       - FLASK_ENV=production
     restart: unless-stopped
