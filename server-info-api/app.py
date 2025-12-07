@@ -5,6 +5,7 @@ import platform
 import time
 import requests
 import os
+from datetime import datetime
 
 app = Flask(__name__, static_folder='../frontend/dist', static_url_path='/')
 CORS(app)
@@ -12,18 +13,17 @@ CORS(app)
 @app.route('/api/server-info', methods=['GET'])
 def get_server_info():
     # 获取操作系统信息
-    # os_name = platform.system()
-    # if os_name == "Linux":
-    #     # 尝试获取更详细的Linux发行版信息
-    #     try:
-    #         with open('/etc/os-release', 'r') as f:
-    #             for line in f:
-    #                 if line.startswith('NAME='):
-    #                     os_name = line.split('=')[1].strip().strip('"')
-    #                     break
-    #     except:
-    #         pass
-    os_name = "NixOS"
+    os_name = platform.system()
+    # 尝试获取更详细的Linux发行版信息
+    try:
+        with open('/etc/os-release', 'r') as f:
+            for line in f:
+                if line.startswith('NAME='):
+                    os_name = line.split('=')[1].strip().strip('"')
+                    break
+    except:
+        pass
+
     # 获取CPU使用率
     cpu_usage = psutil.cpu_percent(interval=1)
     
@@ -59,8 +59,33 @@ def get_server_info():
             "used": round(disk.used / (1024 * 1024 * 1024), 2)
         }
     
-    # 获取系统启动时间
-    boot_time = psutil.boot_time()
+    # 获取系统启动时间（优先使用环境变量 BOOT_TIME）
+    boot_time = None
+    boot_time_env = os.getenv('BOOT_TIME')
+    
+    # 去除首尾的引号和空白字符
+    if boot_time_env:
+        boot_time_env = boot_time_env.strip().strip('"').strip("'")
+    
+    if boot_time_env:
+        try:
+            # 尝试解析为 Unix 时间戳（支持整数和浮点数）
+            boot_time = float(boot_time_env)
+            app.logger.info(f"从环境变量 BOOT_TIME 读取到时间戳: {boot_time}")
+        except ValueError:
+            # 如果不是数字，尝试解析为时间字符串
+            try:
+                # 尝试解析 ISO 格式时间字符串
+                boot_time_dt = datetime.fromisoformat(boot_time_env.replace('Z', '+00:00'))
+                boot_time = boot_time_dt.timestamp()
+                app.logger.info(f"从环境变量 BOOT_TIME 解析时间字符串: {boot_time_env} -> {boot_time}")
+            except Exception as e:
+                app.logger.warning(f"无法解析环境变量 BOOT_TIME 的值 '{boot_time_env}': {e}，将使用系统启动时间")
+                boot_time = psutil.boot_time()
+    else:
+        # 如果没有设置环境变量，使用系统启动时间
+        boot_time = psutil.boot_time()
+    
     uptime_seconds = time.time() - boot_time
     
     # 计算天、小时、分钟、秒
